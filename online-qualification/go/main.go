@@ -34,6 +34,7 @@ func main() {
 		"../out/e_so_many_books.txt",
 		"../out/f_libraries_of_the_world.txt",
 	}
+	score := uint32(0)
 	for i := range files {
 		f, err := os.Create(out[i])
 		if err != nil {
@@ -42,17 +43,18 @@ func main() {
 
 		// Print to STDOUT if DEBUG
 		if DEBUG {
-			doIt(files[i], os.Stdout)
+			score += doIt(files[i], os.Stdout)
 			os.Exit(0)
 		} else {
-			doIt(files[i], f)
+			score += doIt(files[i], f)
 		}
 
 		defer f.Close()
 	}
+	fmt.Printf("total score: %d\n", score)
 }
 
-func doIt(filename string, out io.Writer) {
+func doIt(filename string, out io.Writer) uint32 {
 	f, err := os.Open(filename)
 	if err != nil {
 		log.Fatal(err)
@@ -186,6 +188,9 @@ func doIt(filename string, out io.Writer) {
 		if canTake > len(lib.Books) {
 			canTake = len(lib.Books)
 		}
+		if canTake < 0 {
+			canTake = 0
+		}
 		tBooks := lib.Books[:canTake]
 		for _, tb := range tBooks {
 			score += booksBackup[tb.ID].Score
@@ -197,4 +202,5 @@ func doIt(filename string, out io.Writer) {
 		}
 	}
 	fmt.Printf("score: %d\n", score)
+	return score
 }
