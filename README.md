@@ -1,2 +1,5 @@
-# hashcode-2020-henlo-fiesta
- 
+# Hash Code 2020
+**Henlo Fiesta**
+
+## Repository Structure
+`[round name] / [programming language] / ...`
