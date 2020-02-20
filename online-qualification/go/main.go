@@ -191,6 +191,10 @@ func doIt(filename string, out io.Writer) {
 			score += booksBackup[tb.ID].Score
 			booksBackup[tb.ID].Score = 0
 		}
+		rd -= lib.SignUp
+		if rd <= 0 {
+			break
+		}
 	}
 	fmt.Printf("score: %d\n", score)
 }
