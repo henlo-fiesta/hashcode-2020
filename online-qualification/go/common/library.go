@@ -4,19 +4,20 @@ package common
 type Library struct {
 	ID     uint32
 	Books  []*Book
-	Score  int
+	Score  float32
 	SignUp uint32
 	Ship   uint32 // Shiping Per Day
 }
 
 // CalcScore FUCK
-func (l Library) CalcScore(remainingDays uint32) int {
+func (l Library) CalcScore(remainingDays uint32, signUpCost float32) float32 {
+	scores := float32(-l.SignUp) * signUpCost
+
 	// TODO: remove duplicate books
 	// we gon do that using pointers
 
 	// asume books is already sorted
 	if remainingDays > l.SignUp {
-		scores := 0
 
 		// num of avail books
 		canTake := l.Ship * (remainingDays - l.SignUp)
@@ -30,12 +31,12 @@ func (l Library) CalcScore(remainingDays uint32) int {
 
 		availBooks := l.Books[:canTake]
 		for _, book := range availBooks {
-			scores += int(book.Score)
+			scores += float32(book.Score)
 			// print(scores)
 		}
 		return scores
 	}
-	return -1
+	return scores - 100
 }
 
 // func (l Library)

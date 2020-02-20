@@ -68,12 +68,15 @@ func doIt(filename string, out io.Writer) {
 
 	// Init array
 	books := make([]common.Book, numBooks)
+	meanBookScore := float32(0)
 	for i := range books {
 		books[i].ID = uint32(i)
 		if _, err := fmt.Fscanf(f, "%d", &books[i].Score); err != nil {
 			log.Fatal(err)
 		}
+		meanBookScore += float32(books[i].Score)
 	}
+	meanBookScore /= float32(numBooks)
 
 	if DEBUG {
 		fmt.Println(books)
@@ -85,6 +88,7 @@ func doIt(filename string, out io.Writer) {
 	}*/
 
 	libraries := make([]common.Library, numLibs)
+	meanSignUp := float32(64)
 	for i := range libraries {
 		lib := &libraries[i]
 		lib.ID = uint32(i)
@@ -94,6 +98,7 @@ func doIt(filename string, out io.Writer) {
 			log.Printf("mango")
 			log.Fatal(err)
 		}
+		meanSignUp += float32(lib.SignUp)
 		lib.Books = make([]*common.Book, libNumBooks)
 		for j := range lib.Books {
 			var bookID uint32
@@ -104,6 +109,7 @@ func doIt(filename string, out io.Writer) {
 			lib.Books[j] = &books[bookID]
 		}
 	}
+	meanSignUp /= float32(numLibs)
 
 	// Debug message before doing any computation
 	if DEBUG {
@@ -114,13 +120,14 @@ func doIt(filename string, out io.Writer) {
 	var solLib []common.Library
 	for remainingDays := numDays; remainingDays > 0 && len(libraries) > 0; {
 
+		signUpCost := meanSignUp * meanBookScore
 		// sort books in each lib
 		for idx := range libraries {
 			lib := &libraries[idx]
 			sort.Slice(lib.Books, func(i, j int) bool {
 				return lib.Books[i].Score > lib.Books[j].Score
 			})
-			lib.Score = lib.CalcScore(remainingDays)
+			lib.Score = lib.CalcScore(remainingDays, signUpCost)
 		}
 
 		// DEBUG
