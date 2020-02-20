@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"sort"
@@ -12,7 +13,34 @@ import (
 )
 
 func main() {
-	f, err := os.Open("../samples/a_example.txt")
+	files := []string{
+		"../samples/a_example.txt",
+		"../samples/b_read_on.txt",
+		"../samples/c_incunabula.txt",
+		"../samples/d_tough_choices.txt",
+		"../samples/e_so_many_books.txt",
+		"../samples/f_libraries_of_the_world.txt",
+	}
+	out := []string{
+		"../out/a_example.txt",
+		"../out/b_read_on.txt",
+		"../out/c_incunabula.txt",
+		"../out/d_tough_choices.txt",
+		"../out/e_so_many_books.txt",
+		"../out/f_libraries_of_the_world.txt",
+	}
+	for i := range files {
+		f, err := os.Create(out[i])
+		if err != nil {
+			log.Fatal(err)
+		}
+		doIt(files[i], f)
+		defer f.Close()
+	}
+}
+
+func doIt(filename string, out io.Writer) {
+	f, err := os.Open(filename)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -77,7 +105,7 @@ func main() {
 		}
 
 		// DEBUG
-		fmt.Printf("step: %+v\n", libraries)
+		// fmt.Printf("step: %+v\n", libraries)
 
 		// TODO: Sorting by Lib score
 		sort.Slice(libraries, func(i, j int) bool {
@@ -96,7 +124,7 @@ func main() {
 	}
 
 	// DEBUG
-	fmt.Printf("%+v\n", solLib)
+	// fmt.Printf("%+v\n", solLib)
 
 	/*
 		NumLibUsed
@@ -110,15 +138,14 @@ func main() {
 		0 5
 		0 1 2 3 4
 	*/
-
-	fmt.Printf("%d\n", len(solLib))
+	fmt.Fprintf(out, "%d\n", len(solLib))
 	for i := range solLib {
 		lib := &solLib[i]
-		fmt.Printf("%d %d\n", lib.ID, len(lib.Books))
+		fmt.Fprintf(out, "%d %d\n", lib.ID, len(lib.Books))
 		var ids []string
 		for j := range lib.Books {
 			ids = append(ids, strconv.FormatUint(uint64(lib.Books[j].ID), 10))
 		}
-		fmt.Println(strings.Join(ids, " "))
+		fmt.Fprintln(out, strings.Join(ids, " "))
 	}
 }
