@@ -11,7 +11,7 @@ type Library struct {
 
 // CalcScore FUCK
 func (l Library) CalcScore(remainingDays uint32, signUpCost float32) float32 {
-	scores := float32(-l.SignUp) * signUpCost
+	scores := float32(0)
 
 	// TODO: remove duplicate books
 	// we gon do that using pointers
@@ -24,6 +24,7 @@ func (l Library) CalcScore(remainingDays uint32, signUpCost float32) float32 {
 		if canTake > uint32(len(l.Books)) {
 			canTake = uint32(len(l.Books))
 		}
+
 		// POINTERS remove scanned books
 		/*var books []Book
 		for _, book := range l.Books {
@@ -34,9 +35,7 @@ func (l Library) CalcScore(remainingDays uint32, signUpCost float32) float32 {
 			scores += float32(book.Score)
 			// print(scores)
 		}
-		return scores
+		return scores / float32(l.SignUp)
 	}
-	return scores - 100
+	return -1
 }
-
-// func (l Library)

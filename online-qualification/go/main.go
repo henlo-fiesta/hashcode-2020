@@ -77,6 +77,8 @@ func doIt(filename string, out io.Writer) {
 		meanBookScore += float32(books[i].Score)
 	}
 	meanBookScore /= float32(numBooks)
+	booksBackup := make([]common.Book, numBooks)
+	copy(booksBackup, books)
 
 	if DEBUG {
 		fmt.Println(books)
@@ -174,4 +176,21 @@ func doIt(filename string, out io.Writer) {
 		}
 		fmt.Fprintln(out, strings.Join(ids, " "))
 	}
+
+	// debug print score
+	rd := numDays
+	score := uint32(0)
+	for i := range solLib {
+		lib := &solLib[i]
+		canTake := int(lib.Ship * (rd - lib.SignUp))
+		if canTake > len(lib.Books) {
+			canTake = len(lib.Books)
+		}
+		tBooks := lib.Books[:canTake]
+		for _, tb := range tBooks {
+			score += booksBackup[tb.ID].Score
+			booksBackup[tb.ID].Score = 0
+		}
+	}
+	fmt.Printf("score: %d\n", score)
 }
