@@ -180,11 +180,11 @@ func doIt(filename string, out io.Writer) uint32 {
 	}
 
 	// debug print score
-	rd := numDays
+	rd := int(numDays)
 	score := uint32(0)
 	for i := range solLib {
 		lib := &solLib[i]
-		canTake := int(lib.Ship * (rd - lib.SignUp))
+		canTake := int(lib.Ship * uint32(rd-int(lib.SignUp)))
 		if canTake > len(lib.Books) {
 			canTake = len(lib.Books)
 		}
@@ -196,7 +196,7 @@ func doIt(filename string, out io.Writer) uint32 {
 			score += booksBackup[tb.ID].Score
 			booksBackup[tb.ID].Score = 0
 		}
-		rd -= lib.SignUp
+		rd -= int(lib.SignUp)
 		if rd <= 0 {
 			break
 		}

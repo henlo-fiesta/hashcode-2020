@@ -30,14 +30,14 @@ func (l Library) CalcScore(remainingDays uint32, signUpCost float32) float32 {
 		for _, book := range l.Books {
 		}*/
 
-		completeionCost := (l.SignUp - )
+		completeionCost := (float32(l.SignUp) + float32(canTake/l.Ship))
 
 		availBooks := l.Books[:canTake]
 		for _, book := range availBooks {
 			scores += float32(book.Score)
 			// print(scores)
 		}
-		return scores/float32(l.SignUp) - float32(l.SignUp)
+		return scores / completeionCost
 	}
 	return -1
 }
