@@ -12,14 +12,19 @@ import (
 	"github.com/natebwangsut/hashcode-2020-henlo-fiesta/online-qualification/go/common"
 )
 
+const (
+	// DEBUG FLAG
+	DEBUG = false
+)
+
 func main() {
 	files := []string{
-		"../samples/a_example.txt",
-		"../samples/b_read_on.txt",
-		"../samples/c_incunabula.txt",
-		"../samples/d_tough_choices.txt",
-		"../samples/e_so_many_books.txt",
-		"../samples/f_libraries_of_the_world.txt",
+		"../in/a_example.txt",
+		"../in/b_read_on.txt",
+		"../in/c_incunabula.txt",
+		"../in/d_tough_choices.txt",
+		"../in/e_so_many_books.txt",
+		"../in/f_libraries_of_the_world.txt",
 	}
 	out := []string{
 		"../out/a_example.txt",
@@ -34,7 +39,15 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		doIt(files[i], f)
+
+		// Print to STDOUT if DEBUG
+		if DEBUG {
+			doIt(files[i], os.Stdout)
+			os.Exit(0)
+		} else {
+			doIt(files[i], f)
+		}
+
 		defer f.Close()
 	}
 }
@@ -62,6 +75,10 @@ func doIt(filename string, out io.Writer) {
 		}
 	}
 
+	if DEBUG {
+		fmt.Println(books)
+	}
+
 	/*if _, err = fmt.Fscanln(f); err != nil {
 		log.Printf("hi")
 		log.Fatal(err)
@@ -84,12 +101,14 @@ func doIt(filename string, out io.Writer) {
 			if err != nil {
 				log.Fatal(err)
 			}
-			lib.Books[j] = &books[j]
+			lib.Books[j] = &books[bookID]
 		}
 	}
 
 	// Debug message before doing any computation
-	// fmt.Printf("%+v\n%+v\n", books, libraries)
+	if DEBUG {
+		fmt.Printf("%+v\n%+v\n", books, libraries)
+	}
 
 	// solution
 	var solLib []common.Library
