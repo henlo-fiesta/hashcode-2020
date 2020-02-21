@@ -18,6 +18,8 @@ const (
 )
 
 func main() {
+
+	// Static Files
 	files := []string{
 		"../in/a_example.txt",
 		"../in/b_read_on.txt",
@@ -34,6 +36,7 @@ func main() {
 		"../out/e_so_many_books.txt",
 		"../out/f_libraries_of_the_world.txt",
 	}
+
 	score := uint32(0)
 	for i := range files {
 		f, err := os.Create(out[i])
@@ -54,21 +57,22 @@ func main() {
 	fmt.Printf("total score: %d\n", score)
 }
 
+// doIt calls the main prog with IO redirections
 func doIt(filename string, out io.Writer) uint32 {
+
 	f, err := os.Open(filename)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer f.Close()
 
-	// Fuck im too stoopid to open a fucking file
 	var numBooks, numLibs, numDays uint32
 	_, err = fmt.Fscanf(f, "%d %d %d\n", &numBooks, &numLibs, &numDays)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Init array
+	// Map books to struct
 	books := make([]common.Book, numBooks)
 	meanBookScore := float32(0)
 	for i := range books {
@@ -86,11 +90,15 @@ func doIt(filename string, out io.Writer) uint32 {
 		fmt.Println(books)
 	}
 
-	/*if _, err = fmt.Fscanln(f); err != nil {
-		log.Printf("hi")
-		log.Fatal(err)
-	}*/
+	/*
+		// Was trying to detect last '\n' from books score line
+		if _, err = fmt.Fscanln(f); err != nil {
+			log.Printf("hi")
+			log.Fatal(err)
+		}
+	*/
 
+	// Map libraries to struct
 	libraries := make([]common.Library, numLibs)
 	meanSignUp := float32(64)
 	for i := range libraries {
@@ -99,7 +107,6 @@ func doIt(filename string, out io.Writer) uint32 {
 		var libNumBooks uint32
 		_, err = fmt.Fscanf(f, "%d %d %d\n", &libNumBooks, &lib.SignUp, &lib.Ship)
 		if err != nil {
-			log.Printf("mango")
 			log.Fatal(err)
 		}
 		meanSignUp += float32(lib.SignUp)
@@ -113,6 +120,8 @@ func doIt(filename string, out io.Writer) uint32 {
 			lib.Books[j] = &books[bookID]
 		}
 	}
+
+	// Compute meanSignUp to be used as a scoring mechanism
 	meanSignUp /= float32(numLibs)
 
 	// Debug message before doing any computation
@@ -120,12 +129,11 @@ func doIt(filename string, out io.Writer) uint32 {
 		fmt.Printf("%+v\n%+v\n", books, libraries)
 	}
 
-	// solution
+	// Solution
 	var solLib []common.Library
 	for remainingDays := numDays; remainingDays > 0 && len(libraries) > 0; {
-
 		signUpCost := meanSignUp * meanBookScore
-		// sort books in each lib
+		// Sort books in each lib
 		for idx := range libraries {
 			lib := &libraries[idx]
 			sort.Slice(lib.Books, func(i, j int) bool {
@@ -135,9 +143,10 @@ func doIt(filename string, out io.Writer) uint32 {
 		}
 
 		// DEBUG
-		// fmt.Printf("step: %+v\n", libraries)
+		if DEBUG {
+			fmt.Printf("step: %+v\n", libraries)
+		}
 
-		// TODO: Sorting by Lib score
 		sort.Slice(libraries, func(i, j int) bool {
 			return libraries[i].Score > libraries[j].Score
 		})
@@ -154,14 +163,17 @@ func doIt(filename string, out io.Writer) uint32 {
 	}
 
 	// DEBUG
-	// fmt.Printf("%+v\n", solLib)
+	if DEBUG {
+		fmt.Printf("%+v\n", solLib)
+	}
 
 	/*
+		Score Formatting Logics
 		NumLibUsed
 		<- for each lib
 			LibIndex NumBook
 			Order of Books
-		ex.
+		ex. in/a_example.txt
 		2
 		1 3
 		5 2 3
@@ -179,7 +191,8 @@ func doIt(filename string, out io.Writer) uint32 {
 		fmt.Fprintln(out, strings.Join(ids, " "))
 	}
 
-	// debug print score
+	// Debug print score: does not get included in to the main IO
+	// Only prints to stdout
 	rd := int(numDays)
 	score := uint32(0)
 	for i := range solLib {
